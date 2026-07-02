@@ -67,7 +67,7 @@ def update_product(product_id):
     data = flask.request.get_json()
     product.name = data.get('name', product.name)
     product.price = data.get('price', product.price)
-    return flask.jsonify(product)
+    return flask.jsonify(product.to_dict())
 
 @app.route('/api/products/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
