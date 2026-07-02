@@ -16,6 +16,7 @@ def get_product_by_barcode(barcode):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching product data: {e}")
         return None
+        
 class Product:
     def __init__(self, id, name, price):
         self.id = id
@@ -31,7 +32,7 @@ class Product:
     
 @app.route('/')
 def index():
-    redirect_url = flask.url_for('get_products')
+    redirect_url = flask.url_for('get_product', barcode='737628064502')
     return flask.redirect(redirect_url)
     
 @app.route('/api/products/<barcode>', methods=['GET'])
