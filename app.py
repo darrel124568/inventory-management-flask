@@ -5,10 +5,6 @@ import random, math
 app = flask.Flask(__name__)
 
 products = []
-'''
-Build proxy routes to OpenFoodFacts via Python requests
-'''
-
 def get_product_by_barcode(barcode):
     try:
         response = requests.get(f"https://world.openfoodfacts.net/api/v3.6/product/{barcode}.json")
