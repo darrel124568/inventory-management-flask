@@ -36,14 +36,6 @@ def index():
     redirect_url = flask.url_for('get_product', barcode='737628064502')
     return flask.redirect(redirect_url)
 
-    # product_data = get_product_by_barcode(barcode)
-    # if product_data:
-    #     new_product = Product(id=len(products) + 1, name=product_data["product"].get("product_name", "Unknown"), price=math.floor(random.uniform(1.0, 100.0)))
-    #     products.append(new_product)
-    #     return flask.jsonify(new_product.to_dict())
-    # else:
-    #     return flask.jsonify({'error': 'Product not found'}), 404
-
 @app.route('/api/products', methods=['GET'])
 def get_products():
     return flask.jsonify([product.to_dict() for product in products])
