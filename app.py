@@ -52,8 +52,8 @@ def update_product(product_id):
     if not product:
         return flask.jsonify({'error': 'Product not found'}), 404
     data = flask.request.get_json()
-    product.name = data.get('name', product.name)
-    product.price = data.get('price', product.price)
+    for key, value in data.items():
+        setattr(product, key, value)
     return flask.jsonify(product.to_dict())
 
 @app.route('/api/products/<int:product_id>', methods=['DELETE'])
