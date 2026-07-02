@@ -1,0 +1,1 @@
+Initialize GitHub repo, create feature/crud-api branch. Set up Flask structure with an in-memory array. Build GET, POST, PATCH, DELETE routes for /api/products.
