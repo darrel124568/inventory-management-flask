@@ -1,5 +1,6 @@
 import flask
 import requests
+import random, math
 
 app = flask.Flask(__name__)
 
@@ -34,14 +35,14 @@ class Product:
 def index():
     redirect_url = flask.url_for('get_product', barcode='737628064502')
     return flask.redirect(redirect_url)
-    
-@app.route('/api/products/<barcode>', methods=['GET'])
-def get_product(barcode):
-    product_data = get_product_by_barcode(barcode)
-    if product_data:
-        return flask.jsonify(product_data["product"]["_keywords"])
-    else:
-        return flask.jsonify({'error': 'Product not found'}), 404
+
+    # product_data = get_product_by_barcode(barcode)
+    # if product_data:
+    #     new_product = Product(id=len(products) + 1, name=product_data["product"].get("product_name", "Unknown"), price=math.floor(random.uniform(1.0, 100.0)))
+    #     products.append(new_product)
+    #     return flask.jsonify(new_product.to_dict())
+    # else:
+    #     return flask.jsonify({'error': 'Product not found'}), 404
 
 @app.route('/api/products', methods=['GET'])
 def get_products():
@@ -50,10 +51,13 @@ def get_products():
 @app.route('/api/products', methods=['POST'])
 def create_product():
     data = flask.request.get_json()
-    product_id = len(products) + 1
-    product = Product(id=product_id, name=data['name'], price=data['price'])
-    products.append(product)
-    return flask.jsonify(product), 201
+    product_data = get_product_by_barcode(data.get('barcode'))
+    if product_data:
+        new_product = Product(id=len(products) + 1, name=product_data["product"].get("product_name", "Unknown"), price=math.floor(random.uniform(1.0, 100.0)))
+        products.append(new_product)
+        return flask.jsonify(new_product.to_dict())
+    else:
+        return flask.jsonify({'error': 'Product not found'}), 404
 
 @app.route('/api/products/<int:product_id>', methods=['PATCH'])
 def update_product(product_id):
