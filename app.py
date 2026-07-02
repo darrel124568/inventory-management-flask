@@ -30,11 +30,6 @@ class Product:
             'name': self.name,
             'price': self.price
         }
-    
-@app.route('/')
-def index():
-    redirect_url = flask.url_for('get_product', barcode='737628064502')
-    return flask.redirect(redirect_url)
 
 @app.route('/api/products', methods=['GET'])
 def get_products():
