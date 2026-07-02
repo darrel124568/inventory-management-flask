@@ -6,7 +6,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Inventory Management CLI')
     parser.add_argument('--add', type=int, help='Add a new item to the inventory, enter the barcode of the product to add')
-    # parser.add_argument('--remove', type=str, help='Remove an item from the inventory')
+    parser.add_argument('--remove', type=str, help='Remove an item from the inventory')
     # parser.add_argument('--list', action='store_true', help='List all items in the inventory')
     # parser.add_argument('--update', type=str, help='Update an item in the inventory')
     # parser.add_argument('--get', type=str, help='Get details of an item in the inventory')
@@ -21,6 +21,14 @@ def main():
             print(response.json())
         else:
             print(f"Failed to add product. Status code: {response.status_code}, Response: {response.text}")
+
+    elif args.remove:
+        product_id = args.remove
+        response = requests.delete(f"{base_url}/{product_id}")
+        if response.status_code == 200:
+            print("Product removed successfully!")
+        else:
+            print(f"Failed to remove product. Status code: {response.status_code}, Response: {response.text}")
 
 
 

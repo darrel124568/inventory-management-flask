@@ -64,6 +64,9 @@ def update_product(product_id):
 @app.route('/api/products/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
     global products
+    product = next((p for p in products if p.id == product_id), None)
+    if not product:
+        return flask.jsonify({'error': 'Product not found'}), 404
     products = [p for p in products if p.id != product_id]
     return flask.jsonify({'message': 'Product deleted'}), 200
 
