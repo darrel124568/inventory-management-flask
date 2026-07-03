@@ -92,3 +92,16 @@ def test_cli_list_products(monkeypatch, capsys):
     assert "Another Product" in captured.out
 
 
+#Test listing products when no products are found
+def test_cli_list_no_products(monkeypatch, capsys):
+    def mock_get(url):
+        return MockResponse(200, [])
+
+    monkeypatch.setattr(cli.requests, "get", mock_get)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--list"])
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "No products found in inventory." in captured.out
+
