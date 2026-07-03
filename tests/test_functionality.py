@@ -65,3 +65,20 @@ def test_get_products(client):
     assert "id" in data[0]
     assert "name" in data[0]
     assert "price" in data[0]
+
+#testing Update operations
+def test_update_product(client):
+    # Create a product to update
+    response = client.post('/api/products', json={"barcode": "5449000000996"})
+    product_id = response.get_json()["id"]
+
+    # Test updating the product's name and price
+    response = client.patch(f'/api/products/{product_id}', json={"name": "New name", "price": 19.99})
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["name"] == "New name"
+    assert data["price"] == 19.99
+
+    # Test updating a non-existent product
+    response = client.patch('/api/products/9999', json={"name": "Non-existent Product"})
+    assert response.status_code == 404
