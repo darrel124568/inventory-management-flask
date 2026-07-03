@@ -33,7 +33,7 @@ def test_network_issue(monkeypatch):
     assert product_data is None
 
 
-#testing Creat operations
+#testing Create operations
 @pytest.fixture
 def client():
     return app.app.test_client()
@@ -50,3 +50,18 @@ def test_create_product(client):
     # Test creating a product with an invalid barcode
     response = client.post('/api/products', json={"barcode": "invalid_code"})
     assert response.status_code == 404
+
+#testing Read operations
+def test_get_products(client):
+    # Test getting the list of products
+    response = client.post('/api/products', json={"barcode": "5449000000996"})
+    # Test getting the list of products
+    response = client.get('/api/products')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    # Test that the list contains at least one product
+    assert len(data) > 0
+    assert "id" in data[0]
+    assert "name" in data[0]
+    assert "price" in data[0]
