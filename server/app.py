@@ -19,17 +19,27 @@ class Product:
         self.id = id
         self.name = name
         self.price = price
+        self.barcode = None  
 
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
-            'price': self.price
+            'price': self.price,
+            'barcode': self.barcode
         }
 
 @app.route('/api/products', methods=['GET'])
 def get_products():
     return flask.jsonify([product.to_dict() for product in products])
+
+@app.route('/api/products/<int:product_id>', methods=['GET'])
+def get_product(product_id):
+    product = next((p for p in products if p.id == product_id), None)
+    if product:
+        return flask.jsonify(product.to_dict())
+    else:
+        return flask.jsonify({'error': 'Product not found'}), 404
 
 @app.route('/api/products', methods=['POST'])
 def create_product():
@@ -37,6 +47,7 @@ def create_product():
     product_data = get_product_by_barcode(data.get('barcode'))
     if product_data:
         new_product = Product(id=len(products) + 1, name=product_data["product"].get("product_name", "Unknown"), price=math.floor(random.uniform(1.0, 100.0)))
+        new_product.barcode = data.get('barcode')
         products.append(new_product)
         return flask.jsonify(new_product.to_dict())
     else:

@@ -6,11 +6,11 @@ def main():
     base_url = "http://127.0.0.1:5000/api/products"
 
     parser = argparse.ArgumentParser(description='Inventory Management CLI')
-    parser.add_argument('--add', type=int, help='Add a new item to the inventory, enter the barcode of the product to add')
-    parser.add_argument('--remove', type=str, help='Remove an item from the inventory')
-    parser.add_argument('--list', action='store_true', help='List all items in the inventory')
-    parser.add_argument('--update', type=str, help='Update an item in the inventory')
-    # parser.add_argument('--get', type=str, help='Get details of an item in the inventory')
+    parser.add_argument('--add', '-a', type=int, help='Add a new item to the inventory, enter the barcode of the product to add')
+    parser.add_argument('--remove', '-r', type=str, help='Remove an item from the inventory')
+    parser.add_argument('--list', '-l', action='store_true', help='List all items in the inventory')
+    parser.add_argument('--update', '-u', type=str, help='Update an item in the inventory')
+    parser.add_argument('--get', '-g', type=str, help='Get details of an item in the inventory')
 
     args = parser.parse_args()
 
@@ -40,7 +40,7 @@ def main():
             else:
                 print(Fore.BLUE + "Current Inventory:")
                 for product in products:
-                    print(f"ID: {product['id']}, Name: {product['name']}, Price: ${product['price']}")
+                    print(f" Name: {product['name']}")
         else:
             print(Fore.RED + f"Failed to fetch products. Status code: {response.status_code}, Response: {response.text}")
 
@@ -48,6 +48,7 @@ def main():
         product_id = args.update
         name = input(Fore.CYAN + "Enter new name (leave blank to keep current): ")
         price = input(Fore.CYAN + "Enter new price (leave blank to keep current): ")
+        barcode = input(Fore.CYAN + "Enter new barcode (leave blank to keep current): ")
 
         data = {}
         if name:
@@ -58,6 +59,8 @@ def main():
             except ValueError:
                 print(Fore.RED + "Invalid price. Please enter a numeric value.")
                 return
+        if barcode:
+            data['barcode'] = barcode
 
         if not data:
             print(Fore.YELLOW + "No updates provided.")
@@ -69,6 +72,15 @@ def main():
             print(response.json())
         else:
             print(Fore.RED + f"Failed to update product. Status code: {response.status_code}, Response: {response.text}")
+
+    elif args.get:
+        product_id = args.get
+        response = requests.get(f"{base_url}/{product_id}")
+        if response.status_code == 200:
+            product = response.json()
+            print(Fore.BLUE + f"Product Details: ID: {product['id']}, Name: {product['name']}, Price: ${product['price']}, Barcode: {product['barcode']}")
+        else:
+            print(Fore.RED + f"Failed to fetch product details. Status code: {response.status_code}, Response: {response.text}")
 
     
 
