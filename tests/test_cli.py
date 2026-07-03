@@ -71,4 +71,24 @@ def test_cli_remove_product_failure(monkeypatch, capsys):
     assert "404" in captured.out
 
 
+#Test listing products successfully
+def test_cli_list_products(monkeypatch, capsys):
+    products = [
+        {"id": 1, "name": "Test Product", "price": 10.0},
+        {"id": 2, "name": "Another Product", "price": 20.0},
+    ]
+
+    def mock_get(url):
+        return MockResponse(200, products)
+
+    monkeypatch.setattr(cli.requests, "get", mock_get)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--list"])
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Current Inventory:" in captured.out
+    assert "ID: 1" in captured.out
+    assert "Another Product" in captured.out
+
 
