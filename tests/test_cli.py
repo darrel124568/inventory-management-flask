@@ -105,3 +105,32 @@ def test_cli_list_no_products(monkeypatch, capsys):
     captured = capsys.readouterr()
     assert "No products found in inventory." in captured.out
 
+#test updating product successfully
+def test_cli_update_product_success(monkeypatch, capsys):
+    def mock_patch(url, json):
+        return MockResponse(200, {"id": 1, "name": json.get('name', 'Existing'), "price": json.get('price', 10.0)})
+
+    monkeypatch.setattr(cli.requests, "patch", mock_patch)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--update", "1"])
+    monkeypatch.setattr('builtins.input', lambda prompt='': 'New Name' if 'name' in prompt.lower() else '15.99')
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Product updated successfully!" in captured.out
+    assert "New Name" in captured.out
+
+#Test updating product failure
+def test_cli_update_product_failure(monkeypatch, capsys):
+    def mock_patch(url, json):
+        return MockResponse(404, {"error": "Product not found"}, text='Product not found')
+
+    monkeypatch.setattr(cli.requests, "patch", mock_patch)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--update", "999"])
+    monkeypatch.setattr('builtins.input', lambda prompt='': 'New Name' if 'name' in prompt.lower() else '15.99')
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Failed to update product" in captured.out
+    assert "404" in captured.out
