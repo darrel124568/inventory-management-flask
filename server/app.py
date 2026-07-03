@@ -54,7 +54,17 @@ def create_product():
     data = flask.request.get_json()
     product_data = get_product_by_barcode(data.get('barcode'))
     if product_data:
-        new_product = Product(id=len(products) + 1, name=product_data["product"].get("product_name", "Unknown"), price=math.floor(random.uniform(1.0, 100.0)))
+        product_name = product_data["product"].get("product_name", "Unknown")
+        existing_product = next((p for p in products if p.name == product_name), None)
+        if existing_product:
+            existing_product.quantity += 1
+            return flask.jsonify(existing_product.to_dict())
+
+        new_product = Product(
+            id=len(products) + 1,
+            name=product_name,
+            price=math.floor(random.uniform(1.0, 100.0))
+        )
         new_product.barcode = data.get('barcode')
         products.append(new_product)
         return flask.jsonify(new_product.to_dict())
