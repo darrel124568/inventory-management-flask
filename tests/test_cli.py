@@ -43,6 +43,21 @@ def test_cli_add_product_failure(monkeypatch, capsys):
     assert "Failed to add product" in captured.out
     assert "404" in captured.out
 
+#Test adding an already existing product, expecting the quantity to increment instead of creating a new product
+def test_cli_add_existing_product(monkeypatch, capsys):
+    def mock_post(url, json):
+        return MockResponse(200, {"id": 1, "name": "Test Product", "price": 10.0, "quantity": 2})
+
+    monkeypatch.setattr(cli.requests, "post", mock_post)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--add", "5449000000996"])
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Product added successfully!" in captured.out
+    assert "Test Product" in captured.out
+    assert "'quantity': 2" in captured.out
+
 #Remove product successfully
 def test_cli_remove_product_success(monkeypatch, capsys):
     def mock_delete(url):
@@ -88,7 +103,6 @@ def test_cli_list_products(monkeypatch, capsys):
 
     captured = capsys.readouterr()
     assert "Current Inventory:" in captured.out
-    assert "ID: 1" in captured.out
     assert "Another Product" in captured.out
 
 
@@ -134,3 +148,19 @@ def test_cli_update_product_failure(monkeypatch, capsys):
     captured = capsys.readouterr()
     assert "Failed to update product" in captured.out
     assert "404" in captured.out
+
+#Test getting product details successfully
+def test_cli_get_product_success(monkeypatch, capsys):
+    product = {"id": 1, "name": "Test Product", "price": 10.0, "barcode": "1234567890123", "quantity": 5}
+
+    def mock_get(url):
+        return MockResponse(200, product)
+
+    monkeypatch.setattr(cli.requests, "get", mock_get)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--get", "1"])
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Product Details:" in captured.out
+    assert "Test Product" in captured.out

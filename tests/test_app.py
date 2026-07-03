@@ -51,6 +51,26 @@ def test_create_product(client):
     response = client.post('/api/products', json={"barcode": "invalid_code"})
     assert response.status_code == 404
 
+
+def test_create_product_increments_quantity_when_name_exists(client, monkeypatch):
+    def mock_get_product_by_barcode(barcode):
+        return {"product": {"product_name": "Test Product"}}
+
+    monkeypatch.setattr(app, "get_product_by_barcode", mock_get_product_by_barcode)
+
+    response_one = client.post('/api/products', json={"barcode": "5449000000996"})
+    assert response_one.status_code == 200
+    first_data = response_one.get_json()
+    assert first_data["name"] == "Test Product"
+    assert first_data["quantity"] == 1
+
+    response_two = client.post('/api/products', json={"barcode": "5449000000996"})
+    assert response_two.status_code == 200
+    second_data = response_two.get_json()
+    assert second_data["name"] == "Test Product"
+    assert second_data["quantity"] == 2
+    assert second_data["id"] == first_data["id"]
+
 #testing Read operations
 def test_get_products(client):
     # Test getting the list of products
