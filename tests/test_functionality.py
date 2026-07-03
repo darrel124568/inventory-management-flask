@@ -82,3 +82,17 @@ def test_update_product(client):
     # Test updating a non-existent product
     response = client.patch('/api/products/9999', json={"name": "Non-existent Product"})
     assert response.status_code == 404
+
+#testing Delete operations
+def test_delete_product(client):
+    # Create a product to delete
+    response = client.post('/api/products', json={"barcode": "5449000000996"})
+    product_id = response.get_json()["id"]
+
+    # Test deleting the product
+    response = client.delete(f'/api/products/{product_id}')
+    assert response.status_code == 200
+
+    # Test deleting a non-existent product
+    response = client.delete('/api/products/9999')
+    assert response.status_code == 404

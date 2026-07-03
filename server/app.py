@@ -42,7 +42,7 @@ def create_product():
     else:
         return flask.jsonify({'error': 'Product not found'}), 404
 
-@app.route('/api/products/<int:product_id>', methods=['PATCH'])
+@app.route('/api/products/<int:product_id>', methods=['PATCH', 'PUT'])
 def update_product(product_id):
     product = next((p for p in products if p.id == product_id), None)
     if not product:
