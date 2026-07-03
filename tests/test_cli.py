@@ -43,3 +43,32 @@ def test_cli_add_product_failure(monkeypatch, capsys):
     assert "Failed to add product" in captured.out
     assert "404" in captured.out
 
+#Remove product successfully
+def test_cli_remove_product_success(monkeypatch, capsys):
+    def mock_delete(url):
+        return MockResponse(200)
+
+    monkeypatch.setattr(cli.requests, "delete", mock_delete)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--remove", "1"])
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Product removed successfully!" in captured.out
+
+#fail to remove product
+def test_cli_remove_product_failure(monkeypatch, capsys):
+    def mock_delete(url):
+        return MockResponse(404, {"error": "Product not found"}, text='Product not found')
+
+    monkeypatch.setattr(cli.requests, "delete", mock_delete)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--remove", "999"])
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Failed to remove product" in captured.out
+    assert "404" in captured.out
+
+
+
