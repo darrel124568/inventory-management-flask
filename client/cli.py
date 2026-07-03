@@ -1,4 +1,5 @@
 import argparse, requests
+from colorama import Fore
 
 
 def main():
@@ -17,36 +18,36 @@ def main():
         barcode = args.add
         response = requests.post(f"{base_url}", json={"barcode": barcode})
         if response.status_code == 200:
-            print("Product added successfully!")
+            print(Fore.GREEN + "Product added successfully!")
             print(response.json())
         else:
-            print(f"Failed to add product. Status code: {response.status_code}, Response: {response.text}")
+            print(Fore.RED + f"Failed to add product. Status code: {response.status_code}, Response: {response.text}")
 
     elif args.remove:
         product_id = args.remove
         response = requests.delete(f"{base_url}/{product_id}")
         if response.status_code == 200:
-            print("Product removed successfully!")
+            print(Fore.GREEN + "Product removed successfully!")
         else:
-            print(f"Failed to remove product. Status code: {response.status_code}, Response: {response.text}")
+            print(Fore.RED + f"Failed to remove product. Status code: {response.status_code}, Response: {response.text}")
 
     elif args.list:
         response = requests.get(base_url)
         if response.status_code == 200:
             products = response.json()
             if not products:
-                print("No products found in inventory.")
+                print(Fore.YELLOW + "No products found in inventory.")
             else:
-                print("Current Inventory:")
+                print(Fore.BLUE + "Current Inventory:")
                 for product in products:
                     print(f"ID: {product['id']}, Name: {product['name']}, Price: ${product['price']}")
         else:
-            print(f"Failed to fetch products. Status code: {response.status_code}, Response: {response.text}")
+            print(Fore.RED + f"Failed to fetch products. Status code: {response.status_code}, Response: {response.text}")
 
     elif args.update:
         product_id = args.update
-        name = input("Enter new name (leave blank to keep current): ")
-        price = input("Enter new price (leave blank to keep current): ")
+        name = input(Fore.CYAN + "Enter new name (leave blank to keep current): ")
+        price = input(Fore.CYAN + "Enter new price (leave blank to keep current): ")
 
         data = {}
         if name:
@@ -55,19 +56,19 @@ def main():
             try:
                 data['price'] = float(price)
             except ValueError:
-                print("Invalid price. Please enter a numeric value.")
+                print(Fore.RED + "Invalid price. Please enter a numeric value.")
                 return
 
         if not data:
-            print("No updates provided.")
+            print(Fore.YELLOW + "No updates provided.")
             return
 
         response = requests.patch(f"{base_url}/{product_id}", json=data)
         if response.status_code == 200:
-            print("Product updated successfully!")
+            print(Fore.GREEN + "Product updated successfully!")
             print(response.json())
         else:
-            print(f"Failed to update product. Status code: {response.status_code}, Response: {response.text}")
+            print(Fore.RED + f"Failed to update product. Status code: {response.status_code}, Response: {response.text}")
 
     
 
