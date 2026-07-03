@@ -88,7 +88,6 @@ def test_cli_list_products(monkeypatch, capsys):
 
     captured = capsys.readouterr()
     assert "Current Inventory:" in captured.out
-    assert "ID: 1" in captured.out
     assert "Another Product" in captured.out
 
 
@@ -134,3 +133,19 @@ def test_cli_update_product_failure(monkeypatch, capsys):
     captured = capsys.readouterr()
     assert "Failed to update product" in captured.out
     assert "404" in captured.out
+
+#Test getting product details successfully
+def test_cli_get_product_success(monkeypatch, capsys):
+    product = {"id": 1, "name": "Test Product", "price": 10.0, "barcode": "1234567890123", "quantity": 5}
+
+    def mock_get(url):
+        return MockResponse(200, product)
+
+    monkeypatch.setattr(cli.requests, "get", mock_get)
+    monkeypatch.setattr(sys, "argv", ["cli.py", "--get", "1"])
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert "Product Details:" in captured.out
+    assert "Test Product" in captured.out

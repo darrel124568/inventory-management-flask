@@ -8,9 +8,10 @@ def main():
     parser = argparse.ArgumentParser(description='Inventory Management CLI')
     parser.add_argument('--add', '-a', type=int, help='Add a new item to the inventory, enter the barcode of the product to add')
     parser.add_argument('--remove', '-r', type=str, help='Remove an item from the inventory')
-    parser.add_argument('--list', '-l', action='store_true', help='List all items in the inventory')
+    parser.add_argument('--list', '-ls', action='store_true', help='List all items in the inventory')
     parser.add_argument('--update', '-u', type=str, help='Update an item in the inventory')
     parser.add_argument('--get', '-g', type=str, help='Get details of an item in the inventory')
+    parser.add_argument('--low-stock', '-l', action='store_true', help='List all items in the inventory with low stock')
 
     args = parser.parse_args()
 
@@ -78,9 +79,22 @@ def main():
         response = requests.get(f"{base_url}/{product_id}")
         if response.status_code == 200:
             product = response.json()
-            print(Fore.BLUE + f"Product Details: ID: {product['id']}, Name: {product['name']}, Price: ${product['price']}, Barcode: {product['barcode']}")
+            print(Fore.BLUE + f"Product Details: ID: {product['id']}, Name: {product['name']}, Price: ${product['price']}, Barcode: {product['barcode']} Quantity: {product.get('quantity')}")
         else:
             print(Fore.RED + f"Failed to fetch product details. Status code: {response.status_code}, Response: {response.text}")
+
+    elif args.low_stock:
+        response = requests.get(f"{base_url}/low-stock")
+        if response.status_code == 200:
+            low_stock_products = response.json()
+            if not low_stock_products:
+                print(Fore.YELLOW + "No low stock products found.")
+            else:
+                print(Fore.BLUE + "Low Stock Products:")
+                for product in low_stock_products:
+                    print(Fore.BLUE + f" ID: {product['id']}, Name: {product['name']}, Price: ${product['price']}, Barcode: {product['barcode']}, Quantity: {product.get('quantity')}")
+        else:
+            print(Fore.RED + f"Failed to fetch low stock products. Status code: {response.status_code}, Response: {response.text}")
 
     
 

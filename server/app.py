@@ -20,18 +20,26 @@ class Product:
         self.name = name
         self.price = price
         self.barcode = None  
+        self.quantity = 1  
 
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'price': self.price,
-            'barcode': self.barcode
+            'barcode': self.barcode,
+            'quantity': self.quantity
         }
 
 @app.route('/api/products', methods=['GET'])
 def get_products():
     return flask.jsonify([product.to_dict() for product in products])
+
+@app.route('/api/products/low-stock', methods=['GET'])
+def get_low_stock_products():
+    threshold = flask.request.args.get('threshold', default=2, type=int)
+    low_stock = [product.to_dict() for product in products if product.quantity <= threshold]
+    return flask.jsonify(low_stock)
 
 @app.route('/api/products/<int:product_id>', methods=['GET'])
 def get_product(product_id):
